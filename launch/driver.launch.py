@@ -75,7 +75,7 @@ def generate_launch_description():
         description="The format of RGB camera. Valid options: bgra, jpeg"),
     DeclareLaunchArgument(
         'color_resolution',
-        default_value="1536P",
+        default_value="1080P",
         description="Resolution at which to run the color camera. Valid options: 720P, 1080P, 1440P, 1536P, 2160P, 3072P"),
     DeclareLaunchArgument(
         'fps',
@@ -91,7 +91,7 @@ def generate_launch_description():
         description="Colorize the point cloud using the RBG camera. Requires color_enabled and depth_enabled"),
     DeclareLaunchArgument(
         'point_cloud_in_depth_frame',
-        default_value="false",
+        default_value="true",
         description="Whether the RGB pointcloud is rendered in the depth frame (true) or RGB frame (false). Will either match the resolution of the depth camera (true) or the RGB camera (false)."),
     DeclareLaunchArgument( # Not a parameter of the node, rather a launch file parameter
         'required',

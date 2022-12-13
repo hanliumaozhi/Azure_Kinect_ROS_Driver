@@ -639,8 +639,8 @@ k4a_result_t K4AROSDevice::getPointCloud(const k4a::capture& capture, std::share
 k4a_result_t K4AROSDevice::fillColorPointCloud(const k4a::image& pointcloud_image, const k4a::image& color_image,
                                                std::shared_ptr<sensor_msgs::msg::PointCloud2>& point_cloud)
 {
-  point_cloud->height = pointcloud_image.get_height_pixels();
-  point_cloud->width = pointcloud_image.get_width_pixels();
+  // point_cloud->height = pointcloud_image.get_height_pixels();
+  // point_cloud->width = pointcloud_image.get_width_pixels();
   point_cloud->is_dense = false;
   point_cloud->is_bigendian = false;
 
@@ -654,6 +654,11 @@ k4a_result_t K4AROSDevice::fillColorPointCloud(const k4a::image& pointcloud_imag
 
   sensor_msgs::PointCloud2Modifier pcd_modifier(*point_cloud);
   pcd_modifier.setPointCloud2FieldsByString(2, "xyz", "rgb");
+  
+  point_cloud->height = pointcloud_image.get_height_pixels();
+  point_cloud->width = pointcloud_image.get_width_pixels();
+  point_cloud->row_step = pointcloud_image.get_width_pixels() * point_cloud->point_step;
+  point_cloud->data.resize(point_cloud->height * point_cloud->width * point_cloud->point_step);
 
   sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud, "x");
   sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud, "y");
@@ -663,7 +668,7 @@ k4a_result_t K4AROSDevice::fillColorPointCloud(const k4a::image& pointcloud_imag
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_g(*point_cloud, "g");
   sensor_msgs::PointCloud2Iterator<uint8_t> iter_b(*point_cloud, "b");
 
-  pcd_modifier.resize(point_count);
+  // pcd_modifier.resize(point_count);
 
   const int16_t* point_cloud_buffer = reinterpret_cast<const int16_t*>(pointcloud_image.get_buffer());
   const uint8_t* color_buffer = color_image.get_buffer();
@@ -697,8 +702,8 @@ k4a_result_t K4AROSDevice::fillColorPointCloud(const k4a::image& pointcloud_imag
 
 k4a_result_t K4AROSDevice::fillPointCloud(const k4a::image& pointcloud_image, std::shared_ptr<sensor_msgs::msg::PointCloud2>& point_cloud)
 {
-  point_cloud->height = pointcloud_image.get_height_pixels();
-  point_cloud->width = pointcloud_image.get_width_pixels();
+  // point_cloud->height = pointcloud_image.get_height_pixels();
+  // point_cloud->width = pointcloud_image.get_width_pixels();
   point_cloud->is_dense = false;
   point_cloud->is_bigendian = false;
 
@@ -706,12 +711,17 @@ k4a_result_t K4AROSDevice::fillPointCloud(const k4a::image& pointcloud_image, st
 
   sensor_msgs::PointCloud2Modifier pcd_modifier(*point_cloud);
   pcd_modifier.setPointCloud2FieldsByString(1, "xyz");
+  
+  point_cloud->height = pointcloud_image.get_height_pixels();
+  point_cloud->width = pointcloud_image.get_width_pixels();
+  point_cloud->row_step = pointcloud_image.get_width_pixels() * point_cloud->point_step;
+  point_cloud->data.resize(point_cloud->height * point_cloud->width * point_cloud->point_step);
 
   sensor_msgs::PointCloud2Iterator<float> iter_x(*point_cloud, "x");
   sensor_msgs::PointCloud2Iterator<float> iter_y(*point_cloud, "y");
   sensor_msgs::PointCloud2Iterator<float> iter_z(*point_cloud, "z");
 
-  pcd_modifier.resize(point_count);
+  // pcd_modifier.resize(point_count);
 
   const int16_t* point_cloud_buffer = reinterpret_cast<const int16_t*>(pointcloud_image.get_buffer());
 
@@ -768,7 +778,7 @@ k4a_result_t K4AROSDevice::getBodyMarker(const k4abt_body_t& body, std::shared_p
 
   // Set the lifetime to 0.25 to prevent flickering for even 5fps configurations.
   // New markers with the same ID will replace old markers as soon as they arrive.
-  marker_msg->lifetime = rclcpp::Duration(0.25);
+  marker_msg->lifetime = rclcpp::Duration(0, 250000000);
   marker_msg->id = body.id * 100 + jointType;
   marker_msg->type = Marker::SPHERE;
 
